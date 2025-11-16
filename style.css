@@ -56,8 +56,8 @@ body {
     background: white;
     transition: transform 0.2s ease-out;
     user-select: none;
-    z-index: 2000;
     position: relative;
+    z-index: 2000;
 }
 
 .card img {
@@ -67,7 +67,7 @@ body {
     border-radius: 8px;
 }
 
-/* --- SWIPE OBRAMÓWKI --- */
+/* Obramówki przy głosowaniu */
 .swipe.like { border: 4px solid #2ecc71; }
 .swipe.dislike { border: 4px solid #e74c3c; }
 
@@ -82,21 +82,21 @@ body {
 
 /* --- MODAL --- */
 .modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1000; 
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgba(0,0,0,0.5); 
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
     transition: all 0.3s ease;
 }
 
 .modal-content {
     background-color: #fff;
-    margin: 10% auto; 
+    margin: 10% auto;
     padding: 20px;
     border-radius: 12px;
     max-width: 400px;
@@ -124,32 +124,31 @@ body {
     color: #000;
 }
 
-/* --- BLOKADA SWIPE / KARTA KONIEC --- */
+/* Blokada swipe, ale przyciski nadal działają */
 .card.no-swipe {
-  pointer-events: none; /* blokuje swipe */
+    pointer-events: none;
 }
-
 .card.no-swipe button {
-  pointer-events: auto; /* pozwala przyciskowi hosta klikać */
+    pointer-events: auto;
 }
 
-/* --- WYNIKI --- */
+/* Wyniki */
 #results {
-  z-index: 2000;
-  position: relative;
+    z-index: 2000;
+    position: relative;
 }
 
-/* --- COUNTDOWN --- */
+/* Countdown 3-2-1 */
 .countdown {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  font-size: 80px;
-  transform: translate(-50%, -50%);
-  font-weight: bold;
-  color: white;
-  background: rgba(0,0,0,0.6);
-  padding: 40px 80px;
-  border-radius: 20px;
-  z-index: 9999;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    font-size: 80px;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    color: white;
+    background: rgba(0,0,0,0.6);
+    padding: 40px 80px;
+    border-radius: 20px;
+    z-index: 9999;
 }
