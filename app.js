@@ -28,7 +28,6 @@ const foods = [
   { name: "Chińskie", img: "https://www.gdziezjesc.info/kuchnie/images_new/100170/3.jpg" },
   { name: "Kiełbasa Śląska", img: "https://mojeprodukty.pl/wp-content/uploads/2023/04/kielbasa-slaska-biedronka.jpg" }
 ];
-];
 
 // -----------------------------------------------------------
 // STATE
@@ -352,4 +351,5 @@ function showCountdown(cb) {
     }
   }, 800);
 }
+
 
