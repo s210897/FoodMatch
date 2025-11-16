@@ -1,4 +1,4 @@
-// --- FIREBASE (tylko raz) ---
+// --- FIREBASE ---
 firebase.initializeApp({
   apiKey: "AIzaSyB0fze8Z1NmvNXsX7ncv0R8uENd7YjOM-o",
   authDomain: "foodmatch-210b9.firebaseapp.com",
@@ -12,12 +12,17 @@ const db = firebase.database();
 
 // --- FOOD LIST ---
 const foods = [
-  { name: "Pizza", category: "Włoska", img: "https://images.unsplash.com/photo-1548365328-6c16e4f1a7f2" },
-  { name: "Sushi", category: "Japońska", img: "https://images.unsplash.com/photo-1549880338-65ddcdfd017b" },
-  { name: "Burger", category: "Amerykańska", img: "https://images.unsplash.com/photo-1550547660-d9450f859349" },
-  { name: "Tacos", category: "Meksykańska", img: "https://images.unsplash.com/photo-1544025162-d76694265947" },
-  { name: "Pierogi", category: "Polska", img: "https://images.unsplash.com/photo-1585238342028-1a33bf34f3d6" },
-  { name: "Sałatka", category: "Wege", img: "https://images.unsplash.com/photo-1523986371872-9d3ba2e2f642" }
+  { name: "Pizza", img: "https://cdn.aniagotuje.com/pictures/articles/2023/02/38768537-v-1500x1500.jpg" },
+  { name: "Kuchnia włoska", img: "https://d-art.ppstatic.pl/kadry/k/r/1/f2/7d/5ea014938c265_o_original.jpg" },
+  { name: "Sushi", img: "https://www.kikkoman.pl/fileadmin/_processed_/4/2/csm_sushi-kakkoii_2c56fe3133.webp" },
+  { name: "Burger", img: "https://images.unsplash.com/photo-1550547660-d9450f859349" },
+  { name: "Kuchnia Meksykańska", img: "https://www.wedrowkipokuchni.com.pl/wp-content/uploads/2016/03/8955.jpg" },
+  { name: "Pierogi", img: "https://akademiasmaku.pl/storage/7202/conversions/tradycyjne-pierogi-ruskie-4370-single.webp" },
+  { name: "Sałatka", img: "https://cdn.aniagotuje.com/pictures/articles/2023/07/45298844-v-1500x1500.jpg" },
+  { name: "Tajskie", img: "https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480/img/recipe/ras/Assets/31539B08-C656-4F96-8A50-303989CFC99A/Derivates/c260fa13-c1b4-46a6-a389-592cdb3faae4.jpg" },
+  { name: "Chińskie", img: "https://www.gdziezjesc.info/kuchnie/images_new/100170/3.jpg" }
+
+
 ];
 
 // --- STATE ---
@@ -36,15 +41,10 @@ const img = document.getElementById("foodImg");
 const nameEl = document.getElementById("foodName");
 const catEl = document.getElementById("foodCategory");
 const resultsDiv = document.getElementById("results");
-const yesBtn = document.getElementById("yesBtn");
-const noBtn = document.getElementById("noBtn");
 
-// na starcie ukryj swipe i wyniki
+// --- Hide swipe elements initially ---
 card.style.display = "none";
-yesBtn.style.display = "none";
-noBtn.style.display = "none";
 resultsDiv.style.display = "none";
-
 
 // --- START SCREEN ---
 const startScreen = document.createElement("div");
@@ -69,20 +69,37 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<'
 
 // --- SWIPE LOGIC ---
 function onPointerDown(clientX){ if(animating) return; isDragging=true; startX=clientX; }
-function onPointerMove(clientX){ if(!isDragging||animating) return; currentX=clientX-startX; const rotate=currentX/12; card.style.transform=`translateX(${currentX}px) rotate(${rotate}deg)`; card.classList.toggle("like",currentX>60); card.classList.toggle("dislike",currentX<-60); }
-function onPointerUp(){ if(!isDragging||animating)return; isDragging=false; if(currentX>100) throwCard(1); else if(currentX<-100) throwCard(-1); else{ card.style.transition="0.25s"; card.style.transform="translateX(0) rotate(0)"; card.classList.remove("like","dislike"); setTimeout(()=>card.style.transition="",250); } currentX=0; }
+function onPointerMove(clientX){ 
+  if(!isDragging||animating) return; 
+  currentX=clientX-startX; 
+  const rotate=currentX/12; 
+  card.style.transform=`translateX(${currentX}px) rotate(${rotate}deg)`; 
+  card.classList.toggle("like",currentX>60); 
+  card.classList.toggle("dislike",currentX<-60); 
+}
+function onPointerUp(){ 
+  if(!isDragging||animating)return; 
+  isDragging=false; 
+  if(currentX>100) throwCard(1); 
+  else if(currentX<-100) throwCard(-1); 
+  else{ 
+    card.style.transition="0.25s"; 
+    card.style.transform="translateX(0) rotate(0)"; 
+    card.classList.remove("like","dislike"); 
+    setTimeout(()=>card.style.transition="",250); 
+  } 
+  currentX=0; 
+}
 card.addEventListener("touchstart",e=>onPointerDown(e.touches[0].clientX));
 card.addEventListener("touchmove",e=>{ e.preventDefault(); onPointerMove(e.touches[0].clientX);},{passive:false});
 card.addEventListener("touchend",onPointerUp);
 card.addEventListener("mousedown",e=>onPointerDown(e.clientX));
 window.addEventListener("mousemove",e=>onPointerMove(e.clientX));
 window.addEventListener("mouseup",onPointerUp);
-yesBtn.addEventListener("click",()=>throwCard(1));
-noBtn.addEventListener("click",()=>throwCard(-1));
 
 // --- CREATE / JOIN GROUP ---
 document.getElementById("createBtn").onclick = createGroup;
-document.getElementById("prepareJoinBtn").onclick = ()=>{
+document.getElementById("prepareJoinBtn").onclick = ()=> {
   document.getElementById("groupInput").style.display="block";
   document.getElementById("prepareJoinBtn").onclick=joinGroup;
 };
@@ -94,7 +111,7 @@ function createGroup(){
   user=name; host=name;
   db.ref(`groups/${groupID}/info`).set({created:Date.now(),host:name,started:false})
     .then(()=>{ showLobby(); showToast("Utworzono grupę. ID: "+groupID); })
-    .catch(err=>{ console.error("createGroup error:",err); showToast("Błąd tworzenia grupy"); });
+    .catch(err=>{ console.error(err); showToast("Błąd tworzenia grupy"); });
 }
 
 function joinGroup(){
@@ -111,7 +128,7 @@ function joinGroup(){
     .catch(err=>{ console.error(err); showToast("Błąd dołączania"); });
 }
 
-// --- LOBBY SCREEN ---
+// --- LOBBY ---
 function showLobby(){
   if(startScreen.parentNode) startScreen.remove();
 
@@ -130,63 +147,96 @@ function showLobby(){
   }
   document.body.prepend(lobbyDiv);
 
-  // zapisanie członka do grupy
-  db.ref(`groups/${groupID}/members/${sanitizeKey(user)}`).set(true);
+  db.ref(`groups/${groupID}/members/${sanitizeKey(user)}`).set({finished:false});
 
-  // nasłuchiwanie startu gry
   db.ref(`groups/${groupID}/info/started`).on("value",snap=>{
     if(snap.val()===true) {
-      lobbyDiv.remove();
+      if(lobbyDiv.parentNode) lobbyDiv.remove();
       startSwipe();
     }
   });
 
-  // opcjonalnie: listowanie członków
   db.ref(`groups/${groupID}/members`).on("value",snap=>{
-    const members=snap.val()||{};
-    document.getElementById("membersList").innerHTML=Object.keys(members).join(", ");
+    const members = snap.val() || {};
+    const list = Object.keys(members).map(k=>members[k].finished?`${k} ✅`:k).join(", ");
+    const membersListEl = document.getElementById("membersList");
+    if(membersListEl) membersListEl.innerText = list;
+
+    const allFinished = Object.values(members).every(m=>m.finished);
+    if(allFinished) showFood(); // wyświetlamy ostatnią kartę "Koniec"
   });
 }
 
-// --- START GAME (host) ---
+// --- START GAME ---
 function startGame(){
   db.ref(`groups/${groupID}/info/started`).set(true);
 }
 
-// --- SHOW FOOD / RESULTS ---
-function startSwipe() {
-  index = 0;
-  animating = false;
-  isDragging = false;
-  currentX = 0;
-  resetCardTransformInstant();
-
-  // pokaż UI swipowania
-  card.style.display = "";
-  yesBtn.style.display = "";
-  noBtn.style.display = "";
-  resultsDiv.style.display = "";
-
+// --- SWIPE / VOTE ---
+function startSwipe(){
+  index=0; animating=false; isDragging=false; currentX=0; resetCardTransformInstant();
+  card.style.display="";
+  resultsDiv.style.display="none";
   showFood();
 }
 
 function showFood(){
-  if(index>=foods.length){ showResults(); return; }
-  const f=foods[index];
-  img.src=f.img; nameEl.textContent=f.name; catEl.textContent=f.category;
+  if(index >= foods.length){ 
+    // Ostatnia karta – KONIEC
+    img.src = "";
+    nameEl.textContent = "Koniec!";
+    catEl.textContent = "Dziękujemy za głosowanie 🍽️";
+
+    // blokujemy tylko swipe / przyciski TAK/NIE, ale nie przycisk hosta
+    card.classList.add("no-swipe"); // nowa klasa, którą w CSS możemy ustawić pointer-events: none dla swipe
+
+    // Przycisk Pokaż wyniki tylko dla hosta
+    if(user === host){
+      let showResultsBtn = document.getElementById("showResultsBtn");
+      if(!showResultsBtn){
+        showResultsBtn = document.createElement("button");
+        showResultsBtn.id = "showResultsBtn";
+        showResultsBtn.textContent = "📊 Pokaż wyniki";
+        showResultsBtn.className = "start-btn";
+        showResultsBtn.onclick = () => { showResults(); }
+        card.appendChild(showResultsBtn);
+      }
+    }
+    return; 
+  }
+
+  const f = foods[index];
+  img.src = f.img; 
+  nameEl.textContent = f.name; 
+  catEl.textContent = f.category;
+
+  // Przywracamy interakcje
+  card.classList.remove("no-swipe");
+
+  // Usuń przycisk z poprzedniej karty końcowej, jeśli istnieje
+  const existingBtn = document.getElementById("showResultsBtn");
+  if(existingBtn) existingBtn.remove();
 }
 
 function likeFood(){ vote(true); }
 function dislikeFood(){ vote(false); }
+
 function vote(val){
-  if(!groupID||!user){ showToast("Dołącz do grupy!"); return afterVoteMove(); }
-  const foodName=foods[index].name;
+  if(!groupID||!user){ showToast("Dołącz do grupy!"); return; }
+  if(index >= foods.length) return; 
+  const foodName = foods[index].name;
   db.ref(`groups/${groupID}/votes/${sanitizeKey(user)}/${sanitizeKey(foodName)}`).set(val)
     .catch(err=>{ console.error(err); showToast("Błąd zapisu głosu"); });
   afterVoteMove();
 }
+
 function afterVoteMove(){ index++; setTimeout(()=>showFood(),120); }
 
+function markFinished(){
+  db.ref(`groups/${groupID}/members/${sanitizeKey(user)}/finished`).set(true);
+}
+
+// --- THROW CARD ---
 function throwCard(dir){
   if(animating) return; animating=true;
   card.style.transition="0.35s ease-out";
@@ -195,19 +245,46 @@ function throwCard(dir){
   setTimeout(()=>{ resetCardTransformInstant(); animating=false; },400);
 }
 
+// --- SHOW RESULTS ---
 function showResults(){
-  if(!groupID){ resultsDiv.innerHTML="<p>Brak grupy.</p>"; return; }
-  db.ref(`groups/${groupID}/votes`).once("value").then(snap=>{
-    const data=snap.val()||{}; const tally={};
-    for(const u in data){ const votes=data[u]; for(const f in votes){ if(!tally[f]) tally[f]={likes:0,total:0}; tally[f].total++; if(votes[f]) tally[f].likes++; } }
-    let html=`<h2>Wyniki grupy ${groupID}</h2><p>Użytkownik: <b>${escapeHtml(user)}</b></p>`;
-    for(const f of foods){
-      const key=sanitizeKey(f.name);
-      const r=tally[key];
-      html+=`<p><b>${f.name}</b>: ${r?r.likes:0} / ${r?r.total:0}</p>`;
-    }
-    html+=`<div style="margin-top:12px;"><button id="restartBtn" class="start-btn">🔁 Głosuj jeszcze raz</button></div>`;
-    resultsDiv.innerHTML=html;
-    document.getElementById("restartBtn").addEventListener("click",()=>{ index=0; resultsDiv.innerHTML=""; showFood(); });
-  }).catch(err=>{ console.error(err); showToast("Błąd pobierania wyników"); });
+  if(!groupID){ showToast("Brak grupy"); return; }
+
+  resultsDiv.style.display="block";
+
+  db.ref(`groups/${groupID}/votes`).once("value")
+    .then(snap=>{
+      const data = snap.val() || {};
+      const tally = {};
+      for(const u in data){
+        const votes = data[u] || {};
+        for(const f in votes){
+          if(!tally[f]) tally[f] = { likes:0, total:0 };
+          tally[f].total++;
+          if(votes[f]) tally[f].likes++;
+        }
+      }
+
+      let html=`<h2>Wyniki grupy ${groupID}</h2><p>Użytkownik: <b>${escapeHtml(user)}</b></p>`;
+      for(const f of foods){
+        const key = sanitizeKey(f.name);
+        const r = tally[key];
+        html += `<p><b>${f.name}</b>: ${r?r.likes:0} / ${r?r.total:0}</p>`;
+      }
+
+      html += `<div style="margin-top:12px;"><button id="restartBtn" class="start-btn">🔁 Głosuj jeszcze raz</button></div>`;
+      resultsDiv.innerHTML = html;
+
+      document.getElementById("restartBtn").onclick = ()=>{
+        index=0;
+        resultsDiv.innerHTML="";
+        db.ref(`groups/${groupID}/members`).once("value").then(snap=>{
+          const members = snap.val() || {};
+          for(const m in members){
+            db.ref(`groups/${groupID}/members/${m}/finished`).set(false);
+          }
+        });
+        showFood();
+      };
+    })
+    .catch(err=>{ console.error("Błąd pobierania wyników:", err); showToast("Błąd pobierania wyników"); });
 }
