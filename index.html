@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <title>FoodMatch – Tinder dla jedzenia</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- 🟦 EKRAN STARTOWY (tworzony w JS, ale musi istnieć miejsce w body) -->
+    <!-- JS sam dodaje div.start-screen na górę strony -->
+
+    <h1>FoodMatch 🍕❤️</h1>
+    <p>Przeciągnij kartę 👉 ❤️ lub 👈 ❌</p>
+
+    <!-- 🟧 KARTA Z JEDZENIEM -->
+    <div id="card" class="card swipe">
+        <img id="foodImg" src="" alt="Jedzenie">
+        <h2 id="foodName"></h2>
+        <p id="foodCategory"></p>
+    </div>
+
+    <!-- 🟩 PRZYCISKI TAK / NIE -->
+    <div class="buttons">
+        <button id="noBtn">❌ NIE</button>
+        <button id="yesBtn">❤️ TAK</button>
+    </div>
+
+    <!-- 🟪 WYNIKI -->
+    <div id="results" class="results"></div>
+
+    <!-- Firebase v9 (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <!-- Nasz kod -->
+    <script src="app.js"></script>
+
+</body>
+</html>
