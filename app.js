@@ -83,6 +83,8 @@ function onPointerMove(x) {
   if (!isDragging || animating) return;
   currentX = x - startX;
   card.style.transform = `translateX(${currentX}px) rotate(${currentX / 12}deg)`;
+  card.classList.toggle("like", currentX > 60);
+  card.classList.toggle("dislike", currentX < -60);
 }
 
 function onPointerUp() {
@@ -94,6 +96,7 @@ function onPointerUp() {
   else {
     card.style.transition = "0.25s";
     card.style.transform = "translateX(0) rotate(0)";
+    card.classList.remove("like", "dislike");
     setTimeout(() => (card.style.transition = ""), 250);
   }
   currentX = 0;
@@ -172,27 +175,23 @@ function showLobby() {
 
   document.body.prepend(lobby);
 
-  // Add self
   db.ref(`groups/${groupID}/members/${S(user)}`).set({ finished: false });
 
-  // Watch members
   db.ref(`groups/${groupID}/members`).on("value", snap => {
     const data = snap.val() || {};
-    document.getElementById("membersList").innerText =
-      Object.keys(data)
-        .map(u => (data[u].finished ? `${u} ✔` : u))
-        .join(", ");
+    const membersList = document.getElementById("membersList");
+    if (membersList)
+      membersList.innerText =
+        Object.keys(data).map(u => (data[u].finished ? `${u} ✔` : u)).join(", ");
   });
 
-  // Start signal
   db.ref(`groups/${groupID}/info/started`).on("value", snap => {
     if (snap.val()) {
-      lobby.remove();
+      if (lobby.parentNode) lobby.remove();
       startSwipe();
     }
   });
 
-  // Restart signal
   db.ref(`groups/${groupID}/info/restart`).on("value", snap => {
     if (snap.val()) {
       startSwipe(true);
@@ -219,6 +218,8 @@ function showFood() {
   card.classList.remove("no-swipe");
   img.src = foods[index].img;
   nameEl.innerText = foods[index].name;
+
+  card.classList.remove("like", "dislike");
 }
 
 function swipeVote(dir) {
@@ -238,6 +239,8 @@ function swipeVote(dir) {
 }
 
 function recordVote(v) {
+  if (index >= foods.length) return;
+
   const f = foods[index].name;
   db.ref(`groups/${groupID}/votes/${S(user)}/${S(f)}`).set(v);
 
@@ -245,6 +248,8 @@ function recordVote(v) {
 
   if (index >= foods.length) {
     db.ref(`groups/${groupID}/members/${S(user)}/finished`).set(true);
+    showEndScreen();
+    return;
   }
 
   showFood();
@@ -255,7 +260,7 @@ function recordVote(v) {
 // -----------------------------------------------------------
 function showEndScreen() {
   card.classList.add("no-swipe");
-  img.src = "";
+  img.src = "https://psychiatraplus.pl/wp-content/uploads/2024/07/Smieciowe-jedzenie-a-mozg-scaled.jpg";
   nameEl.textContent = "Koniec!";
 
   if (user === host && !document.getElementById("showResultsBtn")) {
