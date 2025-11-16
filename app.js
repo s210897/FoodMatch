@@ -25,7 +25,9 @@ const foods = [
   { name: "Pierogi", img: "https://akademiasmaku.pl/storage/7202/conversions/tradycyjne-pierogi-ruskie-4370-single.webp" },
   { name: "Sałatka", img: "https://cdn.aniagotuje.com/pictures/articles/2023/07/45298844-v-1500x1500.jpg" },
   { name: "Tajskie", img: "https://assets.tmecosys.com/image/upload/t_web_rdp_recipe_584x480/img/recipe/ras/Assets/31539B08-C656-4F96-8A50-303989CFC99A/Derivates/c260fa13-c1b4-46a6-a389-592cdb3faae4.jpg" },
-  { name: "Chińskie", img: "https://www.gdziezjesc.info/kuchnie/images_new/100170/3.jpg" }
+  { name: "Chińskie", img: "https://www.gdziezjesc.info/kuchnie/images_new/100170/3.jpg" },
+  { name: "Kiełbasa Śląska", img: "https://mojeprodukty.pl/wp-content/uploads/2023/04/kielbasa-slaska-biedronka.jpg" }
+];
 ];
 
 // -----------------------------------------------------------
@@ -350,3 +352,4 @@ function showCountdown(cb) {
     }
   }, 800);
 }
+
