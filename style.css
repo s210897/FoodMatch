@@ -56,6 +56,8 @@ body {
     background: white;
     transition: transform 0.2s ease-out;
     user-select: none;
+     z-index: 2000;
+    position: relative;
 }
 
 .card img {
@@ -128,4 +130,30 @@ body {
 /* pozwalamy przyciskowi hosta na kliknięcie */
 .card.no-swipe button {
   pointer-events: auto;
+}
+#results {
+  z-index: 2000;
+  position: relative;
+}
+.countdown {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  font-size: 80px;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  color: white;
+  background: rgba(0,0,0,0.6);
+  padding: 40px 80px;
+  border-radius: 20px;
+  z-index: 9999;
+}
+
+.no-swipe {
+  pointer-events: none;
+}
+
+#results {
+  z-index: 2000;
+  position: relative;
 }
