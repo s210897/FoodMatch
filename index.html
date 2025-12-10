@@ -1,36 +1,152 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8" />
-    <title>FoodMatch – Tinder dla jedzenia</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <title>Firmowy Komunikator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+
+        #login-box, #chat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        #messages {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #fafafa;
+        }
+
+        .msg {
+            margin-bottom: 10px;
+            padding: 6px 10px;
+            background: #e3e8ff;
+            border-radius: 8px;
+        }
+
+        input, button {
+            padding: 10px;
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #4c70ff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background: #3856cc;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- 🟦 EKRAN STARTOWY (tworzony w JS, ale musi istnieć miejsce w body) -->
-    <!-- JS sam dodaje div.start-screen na górę strony -->
+<h2>📡 Firmowy Komunikator</h2>
+
+<div id="login-box">
+    <h3>Podaj nazwę użytkownika:</h3>
+    <input type="text" id="username-input" placeholder="np. Jan.Kowalski">
+    <button onclick="login()">Dołącz</button>
+</div>
+
+<div id="chat-box" style="display:none;">
+    <h3>Witaj, <span id="user-label"></span> 👋</h3>
+
+    <div id="messages"></div>
+
+    <input type="text" id="message-input" placeholder="Napisz wiadomość...">
+    <button onclick="sendMessage()">Wyślij</button>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+    import { initializeApp } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+    import { getDatabase, ref, push, onValue }
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     
+const firebaseConfig = {
+  apiKey: "AIzaSyDGWz4Kx_cagpB6e720Tqsq7W1MDEANPus",
+  authDomain: "sigkomiunikator.firebaseapp.com",
+  projectId: "sigkomiunikator",
+  storageBucket: "sigkomiunikator.appspot.com",
+  messagingSenderId: "21050986400",
+  appId: "1:21050986400:web:6a9245917ea9170137dec5",
+  measurementId: "G-34XF5PG51W",
+  databaseURL: "https://sigkomiunikator-default-rtdb.europe-west1.firebasedatabase.app"
+};
 
-    <!-- 🟧 KARTA Z JEDZENIEM -->
-    <div id="card" class="card swipe">
-        <h1>FoodMatch</h1>
-    <p>Przeciągnij kartę</p>
-        <img id="foodImg" src=" " alt="Jedzenie">
-        <h2 id="foodName"></h2>
-    </div>
+// Initialize Firebase
 
 
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const chatRef = ref(db, "messages");
 
-    <!-- 🟪 WYNIKI -->
-    <div id="results" class="results"></div>
+    let username = "";
 
-    <!-- Firebase v9 (compat) -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    // Logowanie
+    window.login = function() {
+        const input = document.getElementById("username-input").value.trim();
+        if (input.length < 3) {
+            alert("Podaj poprawną nazwę użytkownika");
+            return;
+        }
+        username = input;
+        document.getElementById("user-label").innerText = username;
 
-    <!-- Nasz kod -->
-    <script src="app.js"></script>
+        document.getElementById("login-box").style.display = "none";
+        document.getElementById("chat-box").style.display = "block";
+    };
+
+    // Wysyłanie wiadomości
+    window.sendMessage = function() {
+        const msg = document.getElementById("message-input").value.trim();
+        if (!msg) return;
+
+        push(chatRef, {
+            user: username,
+            text: msg,
+            time: Date.now()
+        });
+
+        document.getElementById("message-input").value = "";
+    };
+
+    // Odbieranie wiadomości w czasie rzeczywistym
+    onValue(chatRef, (snapshot) => {
+        const messages = document.getElementById("messages");
+        messages.innerHTML = "";
+
+        snapshot.forEach(child => {
+            const data = child.val();
+            const div = document.createElement("div");
+            div.classList.add("msg");
+            div.innerHTML = `<b>${data.user}:</b> ${data.text}`;
+            messages.appendChild(div);
+        });
+
+        messages.scrollTop = messages.scrollHeight;
+    });
+</script>
 
 </body>
 </html>
